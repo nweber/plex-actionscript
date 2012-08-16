@@ -1,0 +1,545 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application 
+	currentState="loggedOut"
+	xmlns:fx="http://ns.adobe.com/mxml/2009"
+	xmlns:s="library://ns.adobe.com/flex/spark"
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	applicationComplete="init()">
+
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayList;
+			import mx.collections.XMLListCollection;
+			import mx.controls.Alert;
+			import mx.utils.Base64Encoder;
+			
+			import net.nweber.plex.QueryParam;
+			import net.nweber.plex.Services;
+			
+			import spark.events.IndexChangeEvent;
+
+			//----------------------------------------
+			//
+			// Variables
+			//
+			//----------------------------------------
+			
+			[Bindable]
+			private var commands:ArrayList = new ArrayList();
+			private var commandData:Object = {};
+			
+			private var moviesKey:String;
+			private var tvShowsKey:String;
+			private var musicKey:String;
+			
+			[Bindable]
+			private var moviesList:XMLListCollection;
+			
+			[Bindable]
+			private var tvShowsList:XMLListCollection;
+			
+			[Bindable]
+			private var musicList:XMLListCollection;
+			
+			private var commandLoader:URLLoader;
+			private var loginToken:String;
+			private var localServerAddress:String;
+			private var remoteServerAddress:String;
+			private var serverPort:String;
+			private var localAvailable:Boolean = false;
+			
+			private function get serverAddress():String {
+				if (localAvailable)
+					return localServerAddress;
+				else
+					return remoteServerAddress;
+			}
+			
+			//----------------------------------------
+			//
+			// Internal Methods
+			//
+			//----------------------------------------
+			
+			private function init():void {
+				commandLoader = new URLLoader();
+				commandLoader.addEventListener(IOErrorEvent.IO_ERROR, onError);
+				commandLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onError);
+			}
+			
+			private function doLogin():void {
+				if (username.text == null || username.text.length == 0 ||
+					password.text == null || password.text.length == 0)
+					Alert.show("Please enter username and password.", "Error");
+				
+				var encoder:Base64Encoder = new Base64Encoder();
+				encoder.insertNewLines = false;
+				encoder.encode(username.text + ":" + password.text);
+				var credentials:String = encoder.flush();
+				
+				var params:Vector.<QueryParam> = new Vector.<QueryParam>();
+				params.push(new QueryParam(Services.LOGIN_PARAM_AUTH, credentials));
+				
+				var commandURL:String = Services.buildServiceURL(Services.LOGIN, params);
+				
+				console.text = "Logging in...";
+				console.text += "\n" + commandURL;
+				progress.label = "Logging in...";
+				
+				var req:URLRequest = new URLRequest(commandURL);
+				commandLoader.addEventListener(Event.COMPLETE, onLoginComplete);
+				commandLoader.load(req);
+				loading.visible = true;
+			}
+			
+			protected function onLoginComplete(event:Event):void {
+				loading.visible = false;
+				commandLoader.removeEventListener(Event.COMPLETE, onLoginComplete);
+				
+				console.text += "\n Logged in!";
+				
+				var data:XML = parse(commandLoader.data);
+				commandData['login'] = data;
+				commands.addItem('login');
+				
+				loginToken = data["authentication-token"];
+				
+				doGetServerList();
+			}
+			
+			private function doGetServerList():void {
+				if (loginToken == null || loginToken.length == 0)
+					Alert.show("Please log in.", "Error");
+				
+				var params:Vector.<QueryParam> = new Vector.<QueryParam>();
+				params.push(new QueryParam(Services.TOKEN_PARAM, loginToken));
+				
+				var commandURL:String = Services.buildServiceURL(Services.GET_SERVERS, params);
+				
+				console.text += "\n Getting server list...";
+				console.text += "\n" + commandURL;
+				progress.label = "Getting server list...";
+				
+				var req:URLRequest = new URLRequest(commandURL);
+				commandLoader.addEventListener(Event.COMPLETE, onGetServersComplete);
+				commandLoader.load(req);
+				loading.visible = true;
+			}
+			
+			protected function onGetServersComplete(event:Event):void {
+				loading.visible = false;
+				commandLoader.removeEventListener(Event.COMPLETE, onGetServersComplete);
+				
+				console.text += "\n Got servers!";
+				
+				var data:XML = parse(commandLoader.data);
+				
+				commandData['servers'] = data;
+				commands.addItem('servers');
+				
+				var list:XMLList = data..Server;
+				var ownedServer:XML;
+				for each (var x:XML in list) {
+					if (x.@owned == "1") {
+						ownedServer = x;
+						break;
+					}
+				}
+				
+				if (!ownedServer) {
+					Alert.show("No servers found!", "Error");
+				}
+				else {
+					console.text += "\n Server: " + ownedServer.@name + " | " + ownedServer.@address + " | " + ownedServer.@localAddresses + " | " + ownedServer.@port;
+					localServerAddress = ownedServer.@localAddresses;
+					remoteServerAddress = ownedServer.@address;
+					serverPort = ownedServer.@port;
+				}
+				
+				findServer();
+			}
+			
+			private function findServer():void {
+				var params:Vector.<QueryParam> = new Vector.<QueryParam>();
+				params.push(new QueryParam(Services.SERVER_ADDRESS_PARAM, localServerAddress));
+				params.push(new QueryParam(Services.SERVER_PORT_PARAM, serverPort));
+				params.push(new QueryParam(Services.TOKEN_PARAM, loginToken));
+				
+				var commandURL:String = Services.buildServiceURL(Services.GET_SECTIONS, params);
+				
+				console.text += "\n Figure out local or remote...";
+				progress.label = "Figure out local or remote...";
+				
+				var req:URLRequest = new URLRequest(commandURL);
+				var loader:URLLoader = new URLLoader();
+				loader.addEventListener(Event.COMPLETE, onFindServerComplete);
+				loader.addEventListener(IOErrorEvent.IO_ERROR, onFindServerError);
+				loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onFindServerError);
+				loader.load(req);
+				loading.visible = true;
+			}
+			
+			private function onFindServerComplete(event:Event):void {
+				var loader:URLLoader = event.target as URLLoader;
+				loader.removeEventListener(Event.COMPLETE, onFindServerComplete);
+				loader.removeEventListener(IOErrorEvent.IO_ERROR, onFindServerError);
+				loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onFindServerError);
+				
+				// be sure we have a valid response
+				try {
+					var data:XML = XML(loader.data);
+					localAvailable = true;
+					console.text += "\n Using local server!";
+				}
+				catch (err:Error) {
+					localAvailable = false;
+					console.text += "\n Using remote server!";
+				}
+				
+				doGetSections();
+			}
+			
+			private function onFindServerError(event:Event):void {
+				var loader:URLLoader = event.target as URLLoader;
+				loader.removeEventListener(Event.COMPLETE, onFindServerComplete);
+				loader.removeEventListener(IOErrorEvent.IO_ERROR, onFindServerError);
+				loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onFindServerError);
+				
+				localAvailable = false;
+				
+				doGetSections();
+			}
+			
+			private function doGetSections():void {
+				var params:Vector.<QueryParam> = getPMSParams();
+				var commandURL:String = Services.buildServiceURL(Services.GET_SECTIONS, params);
+				
+				console.text += "\n Getting sections...";
+				console.text += "\n" + commandURL;
+				progress.label = "Getting sections...";
+				
+				var req:URLRequest = new URLRequest(commandURL);
+				commandLoader.addEventListener(Event.COMPLETE, onGetSectionsComplete);
+				commandLoader.load(req);
+				loading.visible = true;
+			}
+			
+			protected function onGetSectionsComplete(event:Event):void {
+				loading.visible = false;
+				commandLoader.removeEventListener(Event.COMPLETE, onGetSectionsComplete);
+				
+				console.text += "\n Got sections!";
+				
+				var data:XML = parse(commandLoader.data);
+				
+				commandData['sections'] = data;
+				commands.addItem('sections');
+				
+				var list:XMLList = data..Directory;
+				
+				for each (var x:XML in list) {
+					var title:String = x.@title;
+					console.text += "\n Section: " + title;
+					switch (title.toLowerCase()) {
+						case "movies":
+							moviesKey = x.@key;
+							break;
+						case "tv shows":
+							tvShowsKey = x.@key;
+							break;
+						case "music":
+							musicKey = x.@key;
+							break;
+					}
+				}
+				
+				doGetMovies();
+			}
+			
+			private function doGetMovies():void {
+				var params:Vector.<QueryParam> = getPMSParams();
+				params.push(new QueryParam(Services.SECTION_PARAM_ID, moviesKey));
+				var commandURL:String = Services.buildServiceURL(Services.GET_SECTION_CONTENTS, params);
+				
+				console.text += "\n Getting movies...";
+				console.text += "\n" + commandURL;
+				progress.label = "Getting movies...";
+				
+				var req:URLRequest = new URLRequest(commandURL);
+				commandLoader.addEventListener(Event.COMPLETE, onGetMoviesComplete);
+				commandLoader.load(req);
+				loading.visible = true;
+			}
+			
+			protected function onGetMoviesComplete(event:Event):void {
+				loading.visible = false;
+				commandLoader.removeEventListener(Event.COMPLETE, onGetMoviesComplete);
+				
+				console.text += "\n Got section contents!";
+				
+				var data:XML = parse(commandLoader.data);
+				
+				moviesList = new XMLListCollection(data..Video);
+				commandData['movies'] = data;
+				commands.addItem('movies');
+				
+				doGetTvShows();
+			}
+			
+			private function doGetTvShows():void {
+				var params:Vector.<QueryParam> = getPMSParams();
+				params.push(new QueryParam(Services.SECTION_PARAM_ID, tvShowsKey));
+				var commandURL:String = Services.buildServiceURL(Services.GET_SECTION_CONTENTS, params);
+				
+				console.text += "\n Getting tv shows...";
+				console.text += "\n" + commandURL;
+				progress.label = "Getting tv shows...";
+				
+				var req:URLRequest = new URLRequest(commandURL);
+				commandLoader.addEventListener(Event.COMPLETE, onGetTvShowsComplete);
+				commandLoader.load(req);
+				loading.visible = true;
+			}
+			
+			protected function onGetTvShowsComplete(event:Event):void {
+				loading.visible = false;
+				commandLoader.removeEventListener(Event.COMPLETE, onGetTvShowsComplete);
+				
+				console.text += "\n Got section contents!";
+				
+				var data:XML = parse(commandLoader.data);
+				
+				tvShowsList = new XMLListCollection(data..Directory);
+				commandData['tv shows'] = data;
+				commands.addItem('tv shows');
+				
+				doGetMusic();
+			}
+			
+			private function doGetMusic():void {
+				var params:Vector.<QueryParam> = getPMSParams();
+				params.push(new QueryParam(Services.SECTION_PARAM_ID, musicKey));
+				var commandURL:String = Services.buildServiceURL(Services.GET_SECTION_CONTENTS, params);
+				
+				console.text += "\n Getting music...";
+				console.text += "\n" + commandURL;
+				progress.label = "Getting music...";
+				
+				var req:URLRequest = new URLRequest(commandURL);
+				commandLoader.addEventListener(Event.COMPLETE, onGetMusicComplete);
+				commandLoader.load(req);
+				loading.visible = true;
+			}
+			
+			protected function onGetMusicComplete(event:Event):void {
+				loading.visible = false;
+				commandLoader.removeEventListener(Event.COMPLETE, onGetMusicComplete);
+				
+				console.text += "\n Got section contents!";
+				
+				var data:XML = parse(commandLoader.data);
+				
+				musicList = new XMLListCollection(data..Directory);
+				commandData['music'] = data;
+				commands.addItem('music');
+			}
+			
+			private function getPMSParams():Vector.<QueryParam> {
+				var params:Vector.<QueryParam> = new Vector.<QueryParam>();
+				params.push(new QueryParam(Services.SERVER_ADDRESS_PARAM, serverAddress));
+				params.push(new QueryParam(Services.SERVER_PORT_PARAM, serverPort));
+				params.push(new QueryParam(Services.TOKEN_PARAM, loginToken));
+				return params;
+			}
+			
+			private function parse(str:String):XML {
+				var data:XML;
+				
+				try {
+					data = XML(str);
+				}
+				// assume invalid xml is an error message
+				catch (err:Error) {
+					// TODO : Make more advanced...
+					// get status code / reason phrase and display!
+					error("service error");
+				}
+				
+				return data;
+			}
+			
+			private function error(message:String = ""):void {
+				Alert.show("Error executing command: " + message, "Error");
+			}
+			
+			//----------------------------------------
+			//
+			// Handlers
+			//
+			//----------------------------------------
+			
+			protected function onCommandListChange(event:IndexChangeEvent):void {
+				output.text = commandData[event.target.selectedItem];
+			}
+			
+			protected function onError(event:Event):void {
+				error();
+			}
+		]]>
+	</fx:Script>
+
+	<s:states>
+		<s:State name="loggedOut"/>
+		<s:State name="loggedIn"/>
+	</s:states>
+
+
+	<s:VGroup
+		width="100%" height="100%"
+		paddingBottom="10"
+		paddingLeft="10"
+		paddingRight="10"
+		paddingTop="10"
+		gap="10">
+		
+		<s:Label 
+			text="Logged In!"
+			includeIn="loggedIn"/>
+		
+		<s:HGroup 
+			verticalAlign="middle"
+			includeIn="loggedOut"
+			gap="3">
+			
+			<s:Label text="Username:"/>
+			<s:TextInput
+				id="username"
+				width="150"
+				enter="doLogin()"/>
+			
+			<s:Spacer width="10"/>
+			
+			<s:Label text="Password:"/>
+			<s:TextInput
+				id="password"
+				width="150"
+				displayAsPassword="true"
+				enter="doLogin()"/>
+			
+			<s:Spacer width="10"/>
+			
+			<s:Button 
+				label="login"
+				click="doLogin()"/>
+			
+		</s:HGroup>
+		
+		<s:HGroup 
+			width="100%" height="100%"
+			gap="30">
+			
+			<s:TextArea id="console"
+						width="400" height="100%"/>
+			
+			<mx:TabNavigator width="100%" height="100%">
+				
+				<s:NavigatorContent label="XML">
+					<s:VGroup width="100%" height="100%">
+						
+						<s:DropDownList id="commandList"
+										dataProvider="{commands}"
+										change="onCommandListChange(event)"/>
+						
+						<s:TextArea id="output"
+									width="100%" height="100%"/>
+						
+					</s:VGroup>
+				</s:NavigatorContent>
+				
+				<s:NavigatorContent label="Movies">
+					<s:DataGrid
+						width="100%"
+						height="100%"
+						dataProvider="{moviesList}">
+						
+						<s:columns>
+							<s:ArrayList>
+								<s:GridColumn dataField="@title" headerText="Title"/>
+								<s:GridColumn dataField="@duration" headerText="Duration"/>
+								<s:GridColumn dataField="@year" headerText="Year"/>
+								<s:GridColumn dataField="@contentRating" headerText="Content Rating"/>
+								<s:GridColumn dataField="@rating" headerText="Star Rating"/>
+								<s:GridColumn dataField="@type" headerText="Type"/>
+								<s:GridColumn dataField="@key" headerText="Key"/>
+							</s:ArrayList>
+						</s:columns>
+						
+					</s:DataGrid>
+				</s:NavigatorContent>
+				
+				<s:NavigatorContent label="TV Shows">
+					<s:DataGrid
+						width="100%"
+						height="100%"
+						dataProvider="{tvShowsList}">
+						
+						<s:columns>
+							<s:ArrayList>
+								<s:GridColumn dataField="@title" headerText="Title"/>
+								<s:GridColumn dataField="@year" headerText="Year"/>
+								<s:GridColumn dataField="@contentRating" headerText="Content Rating"/>
+								<s:GridColumn dataField="@rating" headerText="Star Rating"/>
+								<s:GridColumn dataField="@type" headerText="Type"/>
+								<s:GridColumn dataField="@key" headerText="Key"/>
+							</s:ArrayList>
+						</s:columns>
+						
+					</s:DataGrid>
+				</s:NavigatorContent>
+				
+				<s:NavigatorContent label="Music">
+					<s:DataGrid
+						width="100%"
+						height="100%"
+						dataProvider="{musicList}">
+						
+						<s:columns>
+							<s:ArrayList>
+								<s:GridColumn dataField="@title" headerText="Title"/>
+								<s:GridColumn dataField="@type" headerText="Type"/>
+								<s:GridColumn dataField="@key" headerText="Key"/>
+							</s:ArrayList>
+						</s:columns>
+						
+					</s:DataGrid>
+				</s:NavigatorContent>
+				
+			</mx:TabNavigator>
+			
+		</s:HGroup>
+		
+	</s:VGroup>
+	
+	<s:Group
+		id="loading"
+		width="100%"
+		height="100%"
+		visible="false">
+		
+		<s:Rect width="100%" height="100%">
+			<s:fill>
+				<s:SolidColor color="white" alpha=".4"/>
+			</s:fill>
+		</s:Rect>
+		
+		<mx:ProgressBar
+			id="progress"
+			width="200"
+			height="75"
+			indeterminate="true"
+			verticalCenter="0"
+			horizontalCenter="0"/>
+		
+	</s:Group>
+	
+</s:Application>
