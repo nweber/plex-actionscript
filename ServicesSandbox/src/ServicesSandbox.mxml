@@ -161,11 +161,9 @@
 			
 			private function findServer():void {
 				var params:Vector.<QueryParam> = new Vector.<QueryParam>();
-				params.push(new QueryParam(Services.SERVER_ADDRESS_PARAM, localServerAddress));
-				params.push(new QueryParam(Services.SERVER_PORT_PARAM, serverPort));
 				params.push(new QueryParam(Services.TOKEN_PARAM, loginToken));
-				
-				var commandURL:String = Services.buildServiceURL(Services.GET_SECTIONS, params);
+				var commandURL:String = "http://" + localServerAddress + ":" + serverPort + "/library/sections";
+				commandURL = Services.appendParams(commandURL, params);
 				
 				console.text += "\n Figure out local or remote...";
 				progress.label = "Figure out local or remote...";
@@ -211,8 +209,9 @@
 			}
 			
 			private function doGetSections():void {
-				var params:Vector.<QueryParam> = getPMSParams();
-				var commandURL:String = Services.buildServiceURL(Services.GET_SECTIONS, params);
+				var params:Vector.<QueryParam> = new Vector.<QueryParam>();
+				params.push(new QueryParam(Services.PSM_TOKEN_PARAM, loginToken));
+				var commandURL:String = Services.appendParams(serverURL + "/library/sections", params);
 				
 				console.text += "\n Getting sections...";
 				console.text += "\n" + commandURL;
@@ -257,9 +256,9 @@
 			}
 			
 			private function doGetMovies():void {
-				var params:Vector.<QueryParam> = getPMSParams();
-				params.push(new QueryParam(Services.SECTION_PARAM_ID, moviesKey));
-				var commandURL:String = Services.buildServiceURL(Services.GET_SECTION_CONTENTS, params);
+				var params:Vector.<QueryParam> = new Vector.<QueryParam>();
+				params.push(new QueryParam(Services.PSM_TOKEN_PARAM, loginToken));
+				var commandURL:String = Services.appendParams(serverURL + "/library/sections/" + moviesKey + "/all", params);
 				
 				console.text += "\n Getting movies...";
 				console.text += "\n" + commandURL;
@@ -287,9 +286,9 @@
 			}
 			
 			private function doGetTvShows():void {
-				var params:Vector.<QueryParam> = getPMSParams();
-				params.push(new QueryParam(Services.SECTION_PARAM_ID, tvShowsKey));
-				var commandURL:String = Services.buildServiceURL(Services.GET_SECTION_CONTENTS, params);
+				var params:Vector.<QueryParam> = new Vector.<QueryParam>();
+				params.push(new QueryParam(Services.PSM_TOKEN_PARAM, loginToken));
+				var commandURL:String = Services.appendParams(serverURL + "/library/sections/" + tvShowsKey + "/all", params);
 				
 				console.text += "\n Getting tv shows...";
 				console.text += "\n" + commandURL;
@@ -317,9 +316,9 @@
 			}
 			
 			private function doGetMusic():void {
-				var params:Vector.<QueryParam> = getPMSParams();
-				params.push(new QueryParam(Services.SECTION_PARAM_ID, musicKey));
-				var commandURL:String = Services.buildServiceURL(Services.GET_SECTION_CONTENTS, params);
+				var params:Vector.<QueryParam> = new Vector.<QueryParam>();
+				params.push(new QueryParam(Services.PSM_TOKEN_PARAM, loginToken));
+				var commandURL:String = Services.appendParams(serverURL + "/library/sections/" + musicKey + "/all", params);
 				
 				console.text += "\n Getting music...";
 				console.text += "\n" + commandURL;
@@ -344,12 +343,8 @@
 				commands.addItem('music');
 			}
 			
-			private function getPMSParams():Vector.<QueryParam> {
-				var params:Vector.<QueryParam> = new Vector.<QueryParam>();
-				params.push(new QueryParam(Services.SERVER_ADDRESS_PARAM, serverAddress));
-				params.push(new QueryParam(Services.SERVER_PORT_PARAM, serverPort));
-				params.push(new QueryParam(Services.TOKEN_PARAM, loginToken));
-				return params;
+			private function get serverURL():String {
+				return "http://" + serverAddress + ":" + serverPort;
 			}
 			
 			private function parse(str:String):XML {

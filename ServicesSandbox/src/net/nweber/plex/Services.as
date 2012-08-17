@@ -13,7 +13,7 @@ package net.nweber.plex
 		//
 		//----------------------------------------
 		
-		private static const USE_LOCAL:Boolean = true;
+		private static const USE_LOCAL:Boolean = false;
 		private static const LOCAL:String = "http://localhost:8070/";
 		private static const REMOTE:String = "http://www.nweber.net/";
 		
@@ -34,8 +34,7 @@ package net.nweber.plex
 		//----------------------------------------
 		
 		public static const TOKEN_PARAM:String = "token";
-		public static const SERVER_ADDRESS_PARAM:String = "server_ip";
-		public static const SERVER_PORT_PARAM:String = "server_port";
+		public static const PSM_TOKEN_PARAM:String = "X-Plex-Token";
 		
 		//----------------------------------------
 		//
@@ -60,41 +59,8 @@ package net.nweber.plex
 		//
 		//----------------------------------------
 		
-		public static const GET_SECTIONS:String = "plex/services/sections.php";
-		public static const GET_SECTION_CONTENTS:String = "plex/services/section_contents.php";
-		public static const SECTION_PARAM_ID:String = "sectionID";
-		
-		//----------------------------------------
-		//
-		// xxxx
-		//
-		//----------------------------------------
-		
-		
-		
-		//----------------------------------------
-		//
-		// xxxx
-		//
-		//----------------------------------------
-		
-		
-		
-		//----------------------------------------
-		//
-		// xxxx
-		//
-		//----------------------------------------
-		
-		
-		
-		//----------------------------------------
-		//
-		// xxxx
-		//
-		//----------------------------------------
-		
-		
+		//public static const GET_SECTIONS:String = "/library/sections";
+		//public static const GET_SECTION_CONTENTS:String = "/library/sections/";
 		
 		//----------------------------------------
 		//
@@ -106,6 +72,12 @@ package net.nweber.plex
 			var url:String = USE_LOCAL ? LOCAL : REMOTE;
 			url += fragment;
 			
+			url = appendParams(url, params);
+			
+			return url;
+		}
+		
+		public static function appendParams(url:String, params:Vector.<QueryParam>=null):String {
 			if (params && params.length > 0) {
 				url += PARAMETERS;
 				var p:QueryParam;
