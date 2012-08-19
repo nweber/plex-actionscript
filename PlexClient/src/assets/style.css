@@ -1,0 +1,49 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+
+@font-face {
+	src: url("assets/GeosansLight.ttf");
+	fontFamily: geosans;
+	fontStyle: normal;
+	fontWeight: normal;
+	advancedAntiAliasing: true;
+	embedAsCff: true;
+}
+
+s|global {
+	fontFamily: geosans;
+	focusAlpha: 0;
+}
+
+s|Application {
+	backgroundColor: #263137;
+}
+
+.whiteLabel {
+	color: #FFFFFF;
+}
+
+.lightBlueLabel {
+	color: #0dafdc;
+}
+
+.darkBlueLabel {
+	color: #18a4cc;
+}
+
+.loginInput {
+	fontSize: 24;
+	skinClass: ClassReference("net.nweber.plex.skins.LoginInputSkin");
+}
+
+.loginButton {
+	fontSize: 24;
+	color: #FFFFFF;
+	skinClass: ClassReference("net.nweber.plex.skins.LoginButtonSkin");
+}
+
+.loginCheckBox {
+	fontSize: 24;
+	skinClass: ClassReference("net.nweber.plex.skins.LoginCheckBoxSkin");
+}

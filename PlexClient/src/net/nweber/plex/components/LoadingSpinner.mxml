@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx">
+	
+	<s:layout>
+		<s:VerticalLayout gap="3"/>
+	</s:layout>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.effects.AnimateProperty;
+			import mx.effects.IEffect;
+			import mx.effects.Parallel;
+			import mx.events.EffectEvent;
+			
+			private var animation:IEffect;
+			private var lastTarget:Object;
+			private var nowTarget:Object;
+			
+			public function startAnimation():void {
+				stopAnimation();
+				
+				nowTarget = sphereOne;
+				animationStep();
+			}
+			
+			protected function animationStep():void {
+				animation = new Parallel();
+				animation.addEventListener(EffectEvent.EFFECT_END, onAnimationEnd);
+				
+				var step:AnimateProperty;
+				
+				if (lastTarget) {
+					step = new AnimateProperty(lastTarget);
+					step.property = "alpha";
+					step.fromValue = 1;
+					step.toValue = 0;
+					(animation as Parallel).addChild(step);
+				}
+				
+				if (nowTarget) {
+					step = new AnimateProperty(nowTarget);
+					step.property = "alpha";
+					step.fromValue = 0;
+					step.toValue = 1;
+					(animation as Parallel).addChild(step);
+				}
+				
+				animation.play();
+			}
+			
+			protected function onAnimationEnd(event:EffectEvent):void {
+				animation.removeEventListener(EffectEvent.EFFECT_END, onAnimationEnd);
+				animation = null;
+				
+				lastTarget = nowTarget;
+				
+				if (lastTarget == sphereOne) {
+					nowTarget = sphereTwo;
+				}
+				else if (lastTarget == sphereTwo) {
+					nowTarget = sphereThree;
+				}
+				else {
+					nowTarget = sphereOne;
+				}
+				
+				animationStep();
+			}
+			
+			public function stopAnimation():void {
+				if (animation) {
+					animation.removeEventListener(EffectEvent.EFFECT_END, onAnimationEnd);
+					animation.end();
+					animation = null;
+				}
+			}
+		]]>
+	</fx:Script>
+	
+	<s:Label
+		styleName="whiteLabel"
+		fontSize="48"
+		text="loading..."/>
+	
+	<s:HGroup width="100%">
+		
+		<s:Ellipse id="sphereOne" width="39" height="39" alpha="0">
+			<s:fill>
+				<s:SolidColor color="0x8dc63f"/>
+			</s:fill>
+		</s:Ellipse>
+		
+		<s:Spacer width="100%"/>
+		
+		<s:Ellipse id="sphereTwo" width="39" height="39" alpha="0">
+			<s:fill>
+				<s:SolidColor color="0xFFFFFF"/>
+			</s:fill>
+		</s:Ellipse>
+		
+		<s:Spacer width="100%"/>
+		
+		<s:Ellipse id="sphereThree" width="39" height="39" alpha="0">
+			<s:fill>
+				<s:SolidColor color="0x086997"/>
+			</s:fill>
+		</s:Ellipse>
+		
+	</s:HGroup>
+	
+</s:Group>

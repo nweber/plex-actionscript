@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	xmlns:plex="net.nweber.plex.*"
+	xmlns:views="net.nweber.plex.views.*"
+	xmlns:components="net.nweber.plex.components.*"
+	currentState="loading">
+	
+	<fx:Style source="assets/style.css"/>
+	
+	<fx:Script>
+		<![CDATA[
+			
+			
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<plex:PlexContext
+			contextView="{this}"/>
+	</fx:Declarations>
+	
+	<s:states>
+		<s:State name="login"/>
+		<s:State name="loading"/>
+		<s:State name="home" stateGroups="mediaGroup"/>
+		<s:State name="movies" stateGroups="mediaGroup"/>
+		<s:State name="tvShows" stateGroups="mediaGroup"/>
+		<s:State name="music" stateGroups="mediaGroup"/>
+		<s:State name="settings"/>
+	</s:states>
+	
+	<views:LoginView
+		width="650" height="300"
+		verticalCenter="0"
+		horizontalCenter="0"
+		visible="false"
+		includeIn="login"/>
+	
+	<components:LoadingSpinner
+		horizontalCenter="0"
+		verticalCenter="0"
+		visible="false"
+		visible.loading="true"/>
+	
+	
+	
+	
+</s:Application>

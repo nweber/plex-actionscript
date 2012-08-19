@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx">
+	
+	<s:Rect width="100%" height="100%">
+		<s:fill>
+			<s:LinearGradient>
+				<s:GradientEntry color="0x49494a"/>
+				<s:GradientEntry color="0x414141"/>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+	
+	<s:Rect width="30" height="100%">
+		<s:fill>
+			<s:LinearGradient>
+				<s:GradientEntry color="0x08648f"/>
+				<s:GradientEntry color="0x086c9d"/>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+	
+	<s:VGroup horizontalCenter="0" gap="10" paddingTop="20">
+		
+		<s:Label
+			text="plex flash client"
+			styleName="darkBlueLabel"
+			fontSize="30"/>
+		
+		<s:TextInput
+			id="usernameField"
+			prompt="USERNAME"
+			width="305" height="45"
+			styleName="loginInput"/>
+		
+		<s:TextInput
+			id="passwordField"
+			prompt="PASSWORD"
+			width="305" height="45"
+			displayAsPassword="true"
+			styleName="loginInput"/>
+		
+		<s:HGroup width="100%" verticalAlign="middle">
+			
+			<s:CheckBox
+				id="rememberField"
+				label="remember me!"
+				styleName="loginCheckBox"/>
+			
+			<s:Spacer width="100%"/>
+			
+			<s:Button
+				id="loginButton"
+				label="LOGIN"
+				width="90"
+				height="45"
+				styleName="loginButton"/>
+			
+		</s:HGroup>
+		
+	</s:VGroup>
+	
+	<s:Label
+		text="adobe flex, osmf"
+		styleName="lightBlueLabel"
+		fontSize="14"
+		bottom="5" right="5"/>
+	
+</s:Group>

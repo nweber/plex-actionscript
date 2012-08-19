@@ -1,5 +1,7 @@
-package net.nweber.plex
+package net.nweber.plex.services.remote
 {
+	import net.nweber.plex.valueObjects.QueryParam;
+
 	/**
 	 * 
 	 * 
@@ -13,8 +15,6 @@ package net.nweber.plex
 		//
 		//----------------------------------------
 		
-		private static const USE_LOCAL:Boolean = false;
-		private static const LOCAL:String = "http://localhost:8070/";
 		private static const REMOTE:String = "http://www.nweber.net/";
 		
 		//----------------------------------------
@@ -60,7 +60,7 @@ package net.nweber.plex
 		//----------------------------------------
 		
 		public static function buildServiceURL(fragment:String, params:Vector.<QueryParam>=null):String {
-			var url:String = USE_LOCAL ? LOCAL : REMOTE;
+			var url:String = REMOTE;
 			url += fragment;
 			
 			url = appendParams(url, params);
