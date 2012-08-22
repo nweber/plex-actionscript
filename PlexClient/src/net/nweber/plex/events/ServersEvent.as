@@ -2,6 +2,8 @@ package net.nweber.plex.events
 {
 	import flash.events.Event;
 	
+	import net.nweber.plex.valueObjects.Server;
+	
 	public class ServersEvent extends Event
 	{
 		//----------------------------------------
@@ -15,12 +17,20 @@ package net.nweber.plex.events
 		
 		//----------------------------------------
 		//
+		//  Properties
+		//
+		//----------------------------------------
+		
+		public var server:Server;
+		
+		//----------------------------------------
+		//
 		//  Public Methods
 		//
 		//----------------------------------------
 		
 		override public function clone():Event {
-			return new ServersEvent(this.type, this.bubbles, this.cancelable);
+			return new ServersEvent(this.type, this.server, this.bubbles, this.cancelable);
 		}
 		
 		//----------------------------------------
@@ -29,8 +39,10 @@ package net.nweber.plex.events
 		//
 		//----------------------------------------
 		
-		public function ServersEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false) {
+		public function ServersEvent(type:String, server:Server=null, bubbles:Boolean=false, cancelable:Boolean=false) {
 			super(type, bubbles, cancelable);
+			
+			this.server = server;
 		}
 	}
 }

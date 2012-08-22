@@ -17,7 +17,7 @@ package net.nweber.plex.parsers.xml
 		//----------------------------------------
 		
 		/*
-		<MediaContainer friendlyName="myPlex" identifier="com.plexapp.plugins.myplex" machineIdentifier="8650bb566e2cff308b97adsasdcff387bf8506099" size="2">
+		<MediaContainer friendlyName="myPlex" identifier="com.plexapp.plugins.myplex" machineIdentifier="8650bb566e2cff308b97adsasdcff387bf8506099" size="1">
 			<Server name="Test Server" address="34.26.318.196" port="32400" host="34.26.318.196" localAddresses="192.168.0.1" machineIdentifier="43df87bew3rnc999e3f51ede750e1672a0fdf958" createdAt="1343860761" updatedAt="1345278111" owned="1"/>
 		</MediaContainer>
 		*/

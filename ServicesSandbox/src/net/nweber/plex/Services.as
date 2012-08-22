@@ -13,7 +13,7 @@ package net.nweber.plex
 		//
 		//----------------------------------------
 		
-		private static const USE_LOCAL:Boolean = false;
+		private static const USE_LOCAL:Boolean = true;
 		private static const LOCAL:String = "http://localhost:8070/";
 		private static const REMOTE:String = "http://www.nweber.net/";
 		

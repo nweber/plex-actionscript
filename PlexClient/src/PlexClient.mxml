@@ -37,7 +37,6 @@
 		width="650" height="300"
 		verticalCenter="0"
 		horizontalCenter="0"
-		visible="false"
 		includeIn="login"/>
 	
 	<components:LoadingSpinner

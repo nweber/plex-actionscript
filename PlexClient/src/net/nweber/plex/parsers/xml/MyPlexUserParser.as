@@ -19,8 +19,8 @@ package net.nweber.plex.parsers.xml
 		
 		/*
 		<user>
-			<username>mersian</username>
-			<email>mersian@gmail.com</email>
+			<username>some_guy</username>
+			<email>somebody@gmail.com</email>
 			<joined-at type="datetime">2012-08-01T02:21:02Z</joined-at>
 			<authentication-token>xxxxxxxxxxxxxxxxxxxxx</authentication-token>
 		</user>

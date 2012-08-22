@@ -6,11 +6,17 @@ package net.nweber.plex.mediators
 	import mx.utils.Base64Encoder;
 	
 	import net.nweber.plex.ApplicationStates;
+	import net.nweber.plex.events.DiscoverServerEvent;
 	import net.nweber.plex.events.LoginEvent;
+	import net.nweber.plex.events.SectionsEvent;
 	import net.nweber.plex.events.ServersEvent;
 	import net.nweber.plex.model.PlexModel;
+	import net.nweber.plex.services.IDiscoverServerService;
 	import net.nweber.plex.services.ILoginService;
+	import net.nweber.plex.services.ISectionsService;
 	import net.nweber.plex.services.IServersService;
+	import net.nweber.plex.valueObjects.LoginInfo;
+	import net.nweber.plex.valueObjects.User;
 	
 	import org.robotlegs.mvcs.Mediator;
 	
@@ -44,6 +50,12 @@ package net.nweber.plex.mediators
 		[Inject]
 		public var serversService:IServersService;
 		
+		[Inject]
+		public var discoveryService:IDiscoverServerService;
+		
+		[Inject]
+		public var sectionsService:ISectionsService;
+		
 		//----------------------------------------
 		//
 		//  Public Methods
@@ -64,6 +76,12 @@ package net.nweber.plex.mediators
 			
 			addContextListener(ServersEvent.COMPLETE, onServersComplete);
 			addContextListener(ServersEvent.ERROR, onServersError);
+			
+			addContextListener(DiscoverServerEvent.LOCAL_AVAILABLE, onLocalServerAvailable);
+			addContextListener(DiscoverServerEvent.REMOTE_AVAILABLE, onRemoteServerAvailable);
+			
+			addContextListener(SectionsEvent.COMPLETE, onSectionsComplete);
+			addContextListener(SectionsEvent.ERROR, onSectionsError);
 		}
 		
 		//----------------------------------------
@@ -95,13 +113,17 @@ package net.nweber.plex.mediators
 		//----------------------------------------
 		
 		private function onExecuteLogin(event:LoginEvent):void {
+			var info:LoginInfo = event.item as LoginInfo;
+			if (!info)
+				return;
+			
 			var encoder:Base64Encoder = new Base64Encoder();
 			encoder.insertNewLines = false;
-			encoder.encode(event.username + ":" + event.password);
+			encoder.encode(info.username + ":" + info.password);
 			var credentials:String = encoder.flush();
 			
 			// save the encoded credentials into a shared object
-			if (event.remember) {
+			if (info.remember) {
 				userSharedObject.data.token = credentials;
 				userSharedObject.flush();
 			}
@@ -110,7 +132,7 @@ package net.nweber.plex.mediators
 		}
 		
 		private function onLoginComplete(event:LoginEvent):void {
-			// go and get the server
+			model.user = (event.item as User);
 			serversService.execute(model.user.token);
 		}
 		
@@ -120,14 +142,35 @@ package net.nweber.plex.mediators
 		}
 		
 		private function onServersComplete(event:ServersEvent):void {
-			// check if local or remote
-			// get sections
-			// get contents of each available section
-			// hide non-available sections!
-			
+			model.server = event.server;
+			discoveryService.execute(model.user.token);
 		}
 		
 		private function onServersError(event:LoginEvent):void {
+			Alert.show("An error occured!", "Error");
+		}
+		
+		private function onLocalServerAvailable(event:DiscoverServerEvent):void {
+			model.localAvailable = true;
+			sectionsService.execute(model.user.token);
+		}
+		
+		private function onRemoteServerAvailable(event:DiscoverServerEvent):void {
+			model.localAvailable = false;
+			sectionsService.execute(model.user.token);
+		}
+		
+		private function onSectionsComplete(event:SectionsEvent):void {
+			model.sections = event.sections;
+			
+			// show home page
+			view.currentState = ApplicationStates.HOME;
+			
+			// get section contents in background
+			
+		}
+		
+		private function onSectionsError(event:LoginEvent):void {
 			Alert.show("An error occured!", "Error");
 		}
 		

@@ -2,25 +2,31 @@ package net.nweber.plex.events
 {
 	import flash.events.Event;
 	
-	public class LoginEvent extends Event
+	import net.nweber.plex.valueObjects.Section;
+	
+	/**
+	 * 
+	 * 
+	 * @author Nathan Weber
+	 */
+	public class SectionsEvent extends Event
 	{
 		//----------------------------------------
 		//
-		//  Constants
+		// Constants
 		//
 		//----------------------------------------
 		
-		public static const EXECUTE:String = "executeLogin";
-		public static const COMPLETE:String = "loginComplete";
-		public static const ERROR:String = "loginError";
+		public static const COMPLETE:String = "sectionsComplete";
+		public static const ERROR:String = "sectionsError";
 		
 		//----------------------------------------
 		//
-		//  Properties
+		// Properties
 		//
 		//----------------------------------------
 		
-		public var item:Object;
+		public var sections:Vector.<Section>;
 		
 		//----------------------------------------
 		//
@@ -29,19 +35,18 @@ package net.nweber.plex.events
 		//----------------------------------------
 		
 		override public function clone():Event {
-			return new LoginEvent(this.type, this.item, this.bubbles, this.cancelable);
+			return new SectionsEvent(this.type, this.sections, this.bubbles, this.cancelable);
 		}
-		
 		//----------------------------------------
 		//
-		//  Constructor
+		// Constructor
 		//
 		//----------------------------------------
 		
-		public function LoginEvent(type:String, item:Object=null, bubbles:Boolean=false, cancelable:Boolean=false) {
+		public function SectionsEvent(type:String, sections:Vector.<Section>=null, bubbles:Boolean=false, cancelable:Boolean=false) {
 			super(type, bubbles, cancelable);
 			
-			this.item = item;
+			this.sections = sections;
 		}
 	}
 }

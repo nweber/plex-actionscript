@@ -7,7 +7,6 @@ package net.nweber.plex.services.remote
 	import flash.net.URLRequest;
 	
 	import net.nweber.plex.events.LoginEvent;
-	import net.nweber.plex.model.PlexModel;
 	import net.nweber.plex.parsers.IUserParser;
 	import net.nweber.plex.services.ILoginService;
 	import net.nweber.plex.valueObjects.QueryParam;
@@ -33,9 +32,6 @@ package net.nweber.plex.services.remote
 		//  Variables
 		//
 		//----------------------------------------
-		
-		[Inject]
-		public var model:PlexModel;
 		
 		[Inject]
 		public var parser:IUserParser;
@@ -87,9 +83,16 @@ package net.nweber.plex.services.remote
 		private function onComplete(event:Event):void {
 			clear();
 			
-			model.user = parser.parse(loader.data);
+			try {
+				var user:User = parser.parse(loader.data);
+				if (!user)
+					throw new Error("No user object.");
+			}
+			catch (err:Error) {
+				throw new Error("Error parsing user XML.");
+			}
 			
-			dispatch(new LoginEvent(LoginEvent.COMPLETE));
+			dispatch(new LoginEvent(LoginEvent.COMPLETE, user));
 		}
 		
 		private function onError(event:Event):void {

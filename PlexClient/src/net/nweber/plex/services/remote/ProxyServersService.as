@@ -7,10 +7,10 @@ package net.nweber.plex.services.remote
 	import flash.net.URLRequest;
 	
 	import net.nweber.plex.events.ServersEvent;
-	import net.nweber.plex.model.PlexModel;
 	import net.nweber.plex.parsers.IServersParser;
 	import net.nweber.plex.services.IServersService;
 	import net.nweber.plex.valueObjects.QueryParam;
+	import net.nweber.plex.valueObjects.Server;
 	
 	import org.robotlegs.mvcs.Actor;
 	
@@ -30,9 +30,6 @@ package net.nweber.plex.services.remote
 		//  Variables
 		//
 		//----------------------------------------
-		
-		[Inject]
-		public var model:PlexModel;
 		
 		[Inject]
 		public var parser:IServersParser;
@@ -84,9 +81,16 @@ package net.nweber.plex.services.remote
 		private function onComplete(event:Event):void {
 			clear();
 			
-			model.server = parser.parse(loader.data);
+			try {
+				var server:Server = parser.parse(loader.data);
+				if (!server)
+					throw new Error("No server object.");
+			}
+			catch (err:Error) {
+				throw new Error("Error parsing server XML.");
+			}
 			
-			dispatch(new ServersEvent(ServersEvent.COMPLETE));
+			dispatch(new ServersEvent(ServersEvent.COMPLETE, server));
 		}
 		
 		private function onError(event:Event):void {

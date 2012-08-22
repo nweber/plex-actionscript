@@ -5,6 +5,7 @@ package net.nweber.plex.mediators
 	import mx.controls.Alert;
 	
 	import net.nweber.plex.events.LoginEvent;
+	import net.nweber.plex.valueObjects.LoginInfo;
 	import net.nweber.plex.views.LoginView;
 	
 	import org.robotlegs.mvcs.Mediator;
@@ -52,7 +53,7 @@ package net.nweber.plex.mediators
 			
 			var remember:Boolean = view.rememberField.selected;
 			
-			dispatch(new LoginEvent(LoginEvent.EXECUTE, username, password, remember));
+			dispatch(new LoginEvent(LoginEvent.EXECUTE, new LoginInfo(username, password, remember)));
 			
 			view.usernameField.text = "";
 			view.passwordField.text = "";
