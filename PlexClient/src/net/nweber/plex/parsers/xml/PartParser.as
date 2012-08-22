@@ -21,7 +21,17 @@ package net.nweber.plex.parsers.xml
 		*/
 		
 		public function parse(value:Object):Part {
-			return null;
+			var data:XML = new XML(value);
+			
+			var p:Part = new Part();
+			
+			p.key = data.@key;
+			p.duration = data.@duration;
+			p.file = data.@file;
+			p.size = data.@size;
+			p.container = data.@container;
+			
+			return p;
 		}
 		
 		//----------------------------------------

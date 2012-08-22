@@ -133,6 +133,17 @@ package net.nweber.plex.valueObjects
 		public function set videoFrameRate(value:String):void {
 			_videoFrameRate = value;
 		}
+		
+		private var _parts:Vector.<Part>;
+
+		public function get parts():Vector.<Part> {
+			return _parts;
+		}
+
+		public function set parts(value:Vector.<Part>):void {
+			_parts = value;
+		}
+
 
 		//----------------------------------------
 		//

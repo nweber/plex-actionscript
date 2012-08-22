@@ -17,7 +17,7 @@ package net.nweber.plex.parsers.xml
 		//----------------------------------------
 		
 		public function parse(value:Object):Artist {
-			
+			return null;
 		}
 		
 		//----------------------------------------

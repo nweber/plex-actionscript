@@ -11,7 +11,8 @@ package net.nweber.plex
 	import net.nweber.plex.parsers.IArtistSectionParser;
 	import net.nweber.plex.parsers.IMediaParser;
 	import net.nweber.plex.parsers.IMovieParser;
-	import net.nweber.plex.parsers.IMovieSectionParser;
+	import net.nweber.plex.parsers.IMoviesSectionParser;
+	import net.nweber.plex.parsers.IPartParser;
 	import net.nweber.plex.parsers.ISectionsParser;
 	import net.nweber.plex.parsers.IServersParser;
 	import net.nweber.plex.parsers.IShowParser;
@@ -24,6 +25,7 @@ package net.nweber.plex
 	import net.nweber.plex.parsers.xml.MoviesSectionParser;
 	import net.nweber.plex.parsers.xml.MyPlexServersParser;
 	import net.nweber.plex.parsers.xml.MyPlexUserParser;
+	import net.nweber.plex.parsers.xml.PartParser;
 	import net.nweber.plex.parsers.xml.SectionsParser;
 	import net.nweber.plex.parsers.xml.ShowParser;
 	import net.nweber.plex.parsers.xml.ShowSectionParser;
@@ -79,13 +81,14 @@ package net.nweber.plex
 			injector.mapSingletonOf(IUserParser, MyPlexUserParser);
 			injector.mapSingletonOf(IServersParser, MyPlexServersParser);
 			injector.mapSingletonOf(ISectionsParser, SectionsParser);
-			injector.mapSingletonOf(IMovieSectionParser, MoviesSectionParser);
+			injector.mapSingletonOf(IMoviesSectionParser, MoviesSectionParser);
 			injector.mapSingletonOf(IShowSectionParser, ShowSectionParser);
 			injector.mapSingletonOf(IArtistSectionParser, ArtistSectionParser);
 			injector.mapSingletonOf(IMovieParser, MovieParser);
 			injector.mapSingletonOf(IShowParser, ShowParser);
 			injector.mapSingletonOf(IArtistParser, ArtistParser);
 			injector.mapSingletonOf(IMediaParser, MediaParser);
+			injector.mapSingletonOf(IPartParser, PartParser);
 		}
 		
 		protected function mapServices():void {

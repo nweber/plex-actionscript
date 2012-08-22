@@ -1,7 +1,7 @@
 package net.nweber.plex.parsers.xml
 {
 	import net.nweber.plex.parsers.IMovieParser;
-	import net.nweber.plex.parsers.IMovieSectionParser;
+	import net.nweber.plex.parsers.IMoviesSectionParser;
 	import net.nweber.plex.valueObjects.Movie;
 	
 	/**
@@ -9,7 +9,7 @@ package net.nweber.plex.parsers.xml
 	 * 
 	 * @author Nathan Weber
 	 */
-	public class MoviesSectionParser implements IMovieSectionParser
+	public class MoviesSectionParser implements IMoviesSectionParser
 	{
 		//----------------------------------------
 		//

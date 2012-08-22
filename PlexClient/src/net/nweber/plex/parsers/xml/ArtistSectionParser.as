@@ -427,7 +427,7 @@ package net.nweber.plex.parsers.xml
 		*/
 		
 		public function parse(value:Object):Vector.<Artist> {
-			
+			return null;
 		}
 		
 		//----------------------------------------

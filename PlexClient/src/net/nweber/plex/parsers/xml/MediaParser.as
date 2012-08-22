@@ -1,7 +1,9 @@
 package net.nweber.plex.parsers.xml
 {
 	import net.nweber.plex.parsers.IMediaParser;
+	import net.nweber.plex.parsers.IPartParser;
 	import net.nweber.plex.valueObjects.Media;
+	import net.nweber.plex.valueObjects.Part;
 	
 	/**
 	 * 
@@ -10,6 +12,15 @@ package net.nweber.plex.parsers.xml
 	 */
 	public class MediaParser implements IMediaParser
 	{
+		//----------------------------------------
+		//
+		// Properties
+		//
+		//----------------------------------------
+		
+		[Inject]
+		public var partParser:IPartParser;
+		
 		//----------------------------------------
 		//
 		// Public Methods
@@ -23,7 +34,35 @@ package net.nweber.plex.parsers.xml
 		*/
 		
 		public function parse(value:Object):Media {
-			return null;
+			var data:XML = new XML(value);
+			var list:XMLList;
+			var x:XML;
+			
+			var m:Media = new Media();
+			
+			m.id = data.@id;
+			m.duration = data.@duration;
+			m.bitrate = data.@bitrate;
+			m.width = data.@width;
+			m.height = data.@height;
+			m.aspectRatio = data.@aspectRatio;
+			m.audioChannels = data.@audioChannels;
+			m.audioCodec = data.@audioCodec;
+			m.videoCodec = data.@videoCodec;
+			m.videoResolution = data.@videoResolution;
+			m.container = data.@container;
+			m.videoFrameRate = data.@videoFrameRate;
+			
+			m.parts = new Vector.<Part>();
+			var part:Part;
+			list = data..Media;
+			for each (x in list) {
+				part = partParser.parse(x);
+				if (part)
+					m.parts.push(part);
+			}
+			
+			return m;
 		}
 		
 		//----------------------------------------
