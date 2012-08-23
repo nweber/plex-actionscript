@@ -7,8 +7,8 @@ package net.nweber.plex.parsers
 	 * 
 	 * @author Nathan Weber
 	 */
-	public interface IShowParser
+	public interface IShowParser extends IItemParser
 	{
-		function parse(value:Object):Show;
+		
 	}
 }

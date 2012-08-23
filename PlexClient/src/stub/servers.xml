@@ -1,0 +1,3 @@
+<MediaContainer friendlyName="myPlex" identifier="com.plexapp.plugins.myplex" machineIdentifier="8650bb566e2cff308b970ba17cff387bf8506099" size="1">
+  <Server name="Test Server" address="92.33.153.285" port="32400" host="92.33.153.285" localAddresses="192.168.1.101" machineIdentifier="43df87bf1e86c999e3f51ede750e1672a0fdf958" createdAt="1343860761" updatedAt="1345538942" owned="1"/>
+</MediaContainer>

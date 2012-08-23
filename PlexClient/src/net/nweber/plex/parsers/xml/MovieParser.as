@@ -44,7 +44,7 @@ package net.nweber.plex.parsers.xml
 		</Video>
 		*/
 		
-		public function parse(value:Object):Movie {
+		public function parse(value:Object):Object {
 			var data:XML = new XML(value);
 			var list:XMLList;
 			var x:XML;
@@ -80,7 +80,7 @@ package net.nweber.plex.parsers.xml
 				m.genres.push(x.@tag);
 			}
 			
-			m.writers;
+			m.writers = new Vector.<String>();
 			list = data..Writer;
 			for each (x in list) {
 				m.writers.push(x.@tag);
@@ -94,7 +94,7 @@ package net.nweber.plex.parsers.xml
 			if (node.length() > 0)
 				m.country = node[0].@tag;
 			
-			m.roles = new Vector.<String>;
+			m.roles = new Vector.<String>();
 			list = data..Role;
 			for each (x in list) {
 				m.roles.push(x.@tag);

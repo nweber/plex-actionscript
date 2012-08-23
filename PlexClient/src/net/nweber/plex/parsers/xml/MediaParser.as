@@ -55,7 +55,7 @@ package net.nweber.plex.parsers.xml
 			
 			m.parts = new Vector.<Part>();
 			var part:Part;
-			list = data..Media;
+			list = data..Part;
 			for each (x in list) {
 				part = partParser.parse(x);
 				if (part)

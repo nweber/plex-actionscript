@@ -3,19 +3,26 @@ package net.nweber.plex.mediators
 	import flash.net.SharedObject;
 	
 	import mx.controls.Alert;
+	import mx.core.mx_internal;
 	import mx.utils.Base64Encoder;
 	
 	import net.nweber.plex.ApplicationStates;
 	import net.nweber.plex.events.DiscoverServerEvent;
 	import net.nweber.plex.events.LoginEvent;
+	import net.nweber.plex.events.SectionContentsEvent;
 	import net.nweber.plex.events.SectionsEvent;
 	import net.nweber.plex.events.ServersEvent;
 	import net.nweber.plex.model.PlexModel;
 	import net.nweber.plex.services.IDiscoverServerService;
+	import net.nweber.plex.services.IGetSectionContentsService;
 	import net.nweber.plex.services.ILoginService;
 	import net.nweber.plex.services.ISectionsService;
 	import net.nweber.plex.services.IServersService;
+	import net.nweber.plex.valueObjects.Artist;
 	import net.nweber.plex.valueObjects.LoginInfo;
+	import net.nweber.plex.valueObjects.Movie;
+	import net.nweber.plex.valueObjects.Section;
+	import net.nweber.plex.valueObjects.Show;
 	import net.nweber.plex.valueObjects.User;
 	
 	import org.robotlegs.mvcs.Mediator;
@@ -37,6 +44,8 @@ package net.nweber.plex.mediators
 		//----------------------------------------
 		
 		private var userSharedObject:SharedObject;
+		private var sectionsToFetch:Vector.<Section>;
+		private var fetchedSection:Section;
 		
 		[Inject]
 		public var view:PlexClient;
@@ -56,6 +65,9 @@ package net.nweber.plex.mediators
 		[Inject]
 		public var sectionsService:ISectionsService;
 		
+		[Inject]
+		public var getSectionContentService:IGetSectionContentsService;
+		
 		//----------------------------------------
 		//
 		//  Public Methods
@@ -63,13 +75,6 @@ package net.nweber.plex.mediators
 		//----------------------------------------
 		
 		override public function onRegister():void {
-			if (checkUserCache()) {
-				startLoading(userSharedObject.data.token);
-			}
-			else {
-				view.currentState = ApplicationStates.LOGIN;
-			}
-			
 			addContextListener(LoginEvent.EXECUTE, onExecuteLogin);
 			addContextListener(LoginEvent.COMPLETE, onLoginComplete);
 			addContextListener(LoginEvent.ERROR, onLoginError);
@@ -82,6 +87,16 @@ package net.nweber.plex.mediators
 			
 			addContextListener(SectionsEvent.COMPLETE, onSectionsComplete);
 			addContextListener(SectionsEvent.ERROR, onSectionsError);
+			
+			addContextListener(SectionContentsEvent.COMPLETE, onGetSectionContentsComplete);
+			addContextListener(SectionContentsEvent.ERROR, onGetSectionContentsError);
+			
+			if (checkUserCache()) {
+				startLoading(userSharedObject.data.token);
+			}
+			else {
+				view.currentState = ApplicationStates.LOGIN;
+			}
 		}
 		
 		//----------------------------------------
@@ -104,6 +119,16 @@ package net.nweber.plex.mediators
 		private function startLoading(token:String):void {
 			loginService.execute(token);
 			view.currentState = ApplicationStates.LOADING;
+		}
+		
+		private function loadPendingSection():void {
+			if (!sectionsToFetch || sectionsToFetch.length == 0) {
+				
+			}
+			else {
+				fetchedSection = sectionsToFetch.pop();
+				getSectionContentService.execute(fetchedSection.key, model.user.token);
+			}
 		}
 		
 		//----------------------------------------
@@ -136,7 +161,7 @@ package net.nweber.plex.mediators
 			serversService.execute(model.user.token);
 		}
 		
-		private function onLoginError(event:ServersEvent):void {
+		private function onLoginError(event:LoginEvent):void {
 			view.currentState = ApplicationStates.LOGIN;
 			Alert.show("An error occured!", "Error");
 		}
@@ -146,7 +171,7 @@ package net.nweber.plex.mediators
 			discoveryService.execute(model.user.token);
 		}
 		
-		private function onServersError(event:LoginEvent):void {
+		private function onServersError(event:ServersEvent):void {
 			Alert.show("An error occured!", "Error");
 		}
 		
@@ -167,10 +192,32 @@ package net.nweber.plex.mediators
 			view.currentState = ApplicationStates.HOME;
 			
 			// get section contents in background
-			
+			sectionsToFetch = model.sections.concat().reverse();
+			loadPendingSection();
 		}
 		
-		private function onSectionsError(event:LoginEvent):void {
+		private function onSectionsError(event:SectionsEvent):void {
+			Alert.show("An error occured!", "Error");
+		}
+		
+		private function onGetSectionContentsComplete(event:SectionContentsEvent):void {
+			switch (fetchedSection.key) {
+				case PlexModel.MOVIES_KEY:
+					model.movies = new Vector.<Movie>(event.items);
+					break;
+				case PlexModel.SHOWS_KEY:
+					model.shows = new Vector.<Show>(event.items);
+					break;
+				case PlexModel.MUSIC_KEY:
+					model.artists = new Vector.<Artist>(event.items);
+					break;
+			}
+			
+			
+			loadPendingSection();
+		}
+		
+		private function onGetSectionContentsError(event:SectionContentsEvent):void {
 			Alert.show("An error occured!", "Error");
 		}
 		

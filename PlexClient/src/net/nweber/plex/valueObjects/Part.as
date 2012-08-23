@@ -1,5 +1,6 @@
 package net.nweber.plex.valueObjects
 {
+
 	/**
 	 *
 	 *
@@ -61,6 +62,16 @@ package net.nweber.plex.valueObjects
 
 		public function set container(value:String):void {
 			_container = value;
+		}
+
+		private var _streams:Vector.<Stream>;
+
+		public function get streams():Vector.<Stream> {
+			return _streams;
+		}
+
+		public function set streams(value:Vector.<Stream>):void {
+			_streams = value;
 		}
 
 		//----------------------------------------

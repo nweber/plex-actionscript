@@ -5,8 +5,8 @@ package net.nweber.plex.parsers
 	 * 
 	 * @author Nathan Weber
 	 */
-	public interface IMovieParser extends IItemParser
+	public interface IItemParser
 	{
-		
+		function parse(value:Object):Object;
 	}
 }
