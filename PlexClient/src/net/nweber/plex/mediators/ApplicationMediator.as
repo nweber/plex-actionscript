@@ -213,7 +213,6 @@ package net.nweber.plex.mediators
 					break;
 			}
 			
-			
 			loadPendingSection();
 		}
 		
