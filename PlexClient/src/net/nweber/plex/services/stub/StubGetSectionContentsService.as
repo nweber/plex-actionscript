@@ -1,5 +1,7 @@
 package net.nweber.plex.services.stub
 {
+	import mx.collections.ArrayList;
+	
 	import net.nweber.plex.events.SectionContentsEvent;
 	import net.nweber.plex.model.PlexModel;
 	import net.nweber.plex.parsers.IItemListParser;
@@ -56,7 +58,7 @@ package net.nweber.plex.services.stub
 		
 		override protected function doParse(data:Object):void {
 			currentSectionKey = null;
-			var items:Array = parser.parse(data);
+			var items:ArrayList = parser.parse(data);
 			dispatch(new SectionContentsEvent(SectionContentsEvent.COMPLETE, items));			
 		}
 		

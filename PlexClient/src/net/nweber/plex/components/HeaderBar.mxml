@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx">
+	
+	<fx:Script>
+		<![CDATA[
+			import net.nweber.plex.model.LayoutModel;
+		]]>
+	</fx:Script>
+	
+	<s:Rect top="0" bottom="0" left="0" right="0">
+		<s:fill>
+			<s:LinearGradient>
+				<s:GradientEntry color="0x08628c"/>
+				<s:GradientEntry color="0x086c9d"/>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+	
+	<s:HGroup
+		top="0" bottom="0"
+		left="{LayoutModel.HORIZONTAL_PADDING}"
+		right="{LayoutModel.HORIZONTAL_PADDING}"
+		verticalAlign="middle">
+		
+		<s:Label
+			id="userLabel"
+			fontSize="30"
+			styleName="whiteLabel"/>
+		
+		<s:Label
+			id="logoutButton"
+			fontSize="30"
+			styleName="lightGreenLabel"
+			text="(logout)"
+			useHandCursor="true"/>
+		
+		<s:Spacer width="100%"/>
+		
+		<s:Label
+			id="dayLabel"
+			fontSize="30"
+			styleName="lightGreenLabel"/>
+		
+		<s:Label
+			id="dateLabel"
+			fontSize="30"
+			styleName="whiteLabel"/>
+		
+		<s:Label
+			id="dividerLabel"
+			fontSize="30"
+			styleName="lightGreenLabel"
+			text="|"/>
+		
+		<s:Label
+			id="timeLabel"
+			fontSize="30"
+			styleName="whiteLabel"/>
+		
+		<s:Label
+			id="amPmLabel"
+			fontSize="30"
+			styleName="lightGreenLabel"/>
+		
+	</s:HGroup>
+	
+</s:Group>

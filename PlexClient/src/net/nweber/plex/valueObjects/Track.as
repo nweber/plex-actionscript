@@ -1,5 +1,6 @@
 package net.nweber.plex.valueObjects
 {
+	[Bindable]
 	/**
 	 *
 	 *

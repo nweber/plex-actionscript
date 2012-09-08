@@ -1,9 +1,9 @@
 package net.nweber.plex.parsers
 {
-	import net.nweber.plex.valueObjects.Section;
+	import mx.collections.ArrayList;
 
 	public interface ISectionsParser
 	{
-		function parse(value:Object):Vector.<Section>;
+		function parse(value:Object):ArrayList;
 	}
 }

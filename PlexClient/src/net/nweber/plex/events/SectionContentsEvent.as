@@ -2,7 +2,7 @@ package net.nweber.plex.events
 {
 	import flash.events.Event;
 	
-	import net.nweber.plex.valueObjects.Section;
+	import mx.collections.ArrayList;
 	
 	/**
 	 * 
@@ -26,8 +26,7 @@ package net.nweber.plex.events
 		//
 		//----------------------------------------
 		
-		// vector of some sort
-		public var items:Array;
+		public var items:ArrayList;
 		
 		//----------------------------------------
 		//
@@ -44,7 +43,7 @@ package net.nweber.plex.events
 		//
 		//----------------------------------------
 		
-		public function SectionContentsEvent(type:String, items:Array=null, bubbles:Boolean=false, cancelable:Boolean=false) {
+		public function SectionContentsEvent(type:String, items:ArrayList=null, bubbles:Boolean=false, cancelable:Boolean=false) {
 			super(type, bubbles, cancelable);
 			
 			this.items = items;

@@ -1,5 +1,7 @@
 package net.nweber.plex.parsers.xml
 {
+	import mx.collections.ArrayList;
+	
 	import net.nweber.plex.parsers.ISectionsParser;
 	import net.nweber.plex.valueObjects.Section;
 	
@@ -30,8 +32,8 @@ package net.nweber.plex.parsers.xml
 		</MediaContainer>
 		*/
 		
-		public function parse(value:Object):Vector.<Section> {
-			var sections:Vector.<Section> = new Vector.<Section>();
+		public function parse(value:Object):ArrayList {
+			var sections:ArrayList = new ArrayList();
 			
 			var title:String;
 			var type:String;
@@ -46,8 +48,11 @@ package net.nweber.plex.parsers.xml
 				type = x.@type;
 				key = x.@key;
 				art = x.@art;
-				sections.push(new Section(title, type, key, art));
+				sections.addItem(new Section(title, type, key, art));
 			}
+			
+			// add hardcoded settings section
+			sections.addItem(new Section("Settings", "settings", "", ""));
 			
 			return sections;
 		}

@@ -1,6 +1,6 @@
 package net.nweber.plex.parsers
 {
-	import net.nweber.plex.valueObjects.Season;
+	import mx.collections.ArrayList;
 
 	/**
 	 * 
@@ -9,6 +9,6 @@ package net.nweber.plex.parsers
 	 */
 	public interface IItemListParser
 	{
-		function parse(value:Object):Array;
+		function parse(value:Object):ArrayList;
 	}
 }

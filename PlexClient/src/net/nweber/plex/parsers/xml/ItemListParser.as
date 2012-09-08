@@ -1,5 +1,7 @@
 package net.nweber.plex.parsers.xml
 {
+	import mx.collections.ArrayList;
+	
 	import net.nweber.plex.parsers.IAlbumParser;
 	import net.nweber.plex.parsers.IArtistParser;
 	import net.nweber.plex.parsers.IEpisodeParser;
@@ -46,12 +48,12 @@ package net.nweber.plex.parsers.xml
 		//
 		//----------------------------------------
 		
-		public function parse(value:Object):Array {
+		public function parse(value:Object):ArrayList {
 			var data:XML = new XML(value);
 			var list:XMLList;
 			var x:XML;
 			
-			var collection:Array = [];
+			var collection:ArrayList = new ArrayList();
 			var parser:IItemParser;
 			var item:Object;
 			
@@ -61,7 +63,7 @@ package net.nweber.plex.parsers.xml
 				if (parser)
 					item = parser.parse(x);
 				if (item)
-					collection.push(item);
+					collection.addItem(item);
 			}
 			
 			list = data..Directory;
@@ -70,7 +72,7 @@ package net.nweber.plex.parsers.xml
 				if (parser)
 					item = parser.parse(x);
 				if (item)
-					collection.push(item);
+					collection.addItem(item);
 			}
 			
 			return collection;

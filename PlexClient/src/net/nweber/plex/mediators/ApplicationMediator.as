@@ -11,7 +11,9 @@ package net.nweber.plex.mediators
 	import net.nweber.plex.events.LoginEvent;
 	import net.nweber.plex.events.SectionContentsEvent;
 	import net.nweber.plex.events.SectionsEvent;
+	import net.nweber.plex.events.SelectionEvent;
 	import net.nweber.plex.events.ServersEvent;
+	import net.nweber.plex.model.LayoutModel;
 	import net.nweber.plex.model.PlexModel;
 	import net.nweber.plex.services.IDiscoverServerService;
 	import net.nweber.plex.services.IGetSectionContentsService;
@@ -44,7 +46,7 @@ package net.nweber.plex.mediators
 		//----------------------------------------
 		
 		private var userSharedObject:SharedObject;
-		private var sectionsToFetch:Vector.<Section>;
+		private var sectionsToFetch:Array;
 		private var fetchedSection:Section;
 		
 		[Inject]
@@ -52,6 +54,9 @@ package net.nweber.plex.mediators
 		
 		[Inject]
 		public var model:PlexModel;
+		
+		[Inject]
+		public var layoutModel:LayoutModel;
 		
 		[Inject]
 		public var loginService:ILoginService;
@@ -91,6 +96,8 @@ package net.nweber.plex.mediators
 			addContextListener(SectionContentsEvent.COMPLETE, onGetSectionContentsComplete);
 			addContextListener(SectionContentsEvent.ERROR, onGetSectionContentsError);
 			
+			addContextListener(SelectionEvent.SELECT_SECTION, onSelectSection);
+			
 			if (checkUserCache()) {
 				startLoading(userSharedObject.data.token);
 			}
@@ -122,11 +129,13 @@ package net.nweber.plex.mediators
 		}
 		
 		private function loadPendingSection():void {
-			if (!sectionsToFetch || sectionsToFetch.length == 0) {
-				
-			}
-			else {
+			while (sectionsToFetch.length > 0) {
 				fetchedSection = sectionsToFetch.pop();
+				if (fetchedSection.key != null && fetchedSection.key.length > 0)
+					break;
+			}
+			
+			if (fetchedSection && fetchedSection.key != null && fetchedSection.key.length > 0) {
 				getSectionContentService.execute(fetchedSection.key, model.user.token);
 			}
 		}
@@ -192,7 +201,7 @@ package net.nweber.plex.mediators
 			view.currentState = ApplicationStates.HOME;
 			
 			// get section contents in background
-			sectionsToFetch = model.sections.concat().reverse();
+			sectionsToFetch = model.sections.source.concat().reverse();
 			loadPendingSection();
 		}
 		
@@ -203,13 +212,13 @@ package net.nweber.plex.mediators
 		private function onGetSectionContentsComplete(event:SectionContentsEvent):void {
 			switch (fetchedSection.key) {
 				case PlexModel.MOVIES_KEY:
-					model.movies = new Vector.<Movie>(event.items);
+					model.movies = event.items;
 					break;
 				case PlexModel.SHOWS_KEY:
-					model.shows = new Vector.<Show>(event.items);
+					model.shows = event.items;
 					break;
 				case PlexModel.MUSIC_KEY:
-					model.artists = new Vector.<Artist>(event.items);
+					model.artists = event.items;
 					break;
 			}
 			
@@ -218,6 +227,20 @@ package net.nweber.plex.mediators
 		
 		private function onGetSectionContentsError(event:SectionContentsEvent):void {
 			Alert.show("An error occured!", "Error");
+		}
+		
+		private function onSelectSection(event:SelectionEvent):void {
+			switch (event.item.type) {
+				case "movie":
+					view.currentState = ApplicationStates.MOVIES;
+					break;
+				case "show":
+					view.currentState = ApplicationStates.TV_SHOWS;
+					break;
+				case "artist":
+					view.currentState = ApplicationStates.MUSIC;
+					break;
+			}
 		}
 		
 		//----------------------------------------

@@ -2,52 +2,15 @@ package net.nweber.plex
 {
 	import flash.display.DisplayObjectContainer;
 	
-	import net.nweber.plex.components.LoadingSpinner;
-	import net.nweber.plex.mediators.ApplicationMediator;
-	import net.nweber.plex.mediators.LoadingMediator;
-	import net.nweber.plex.mediators.LoginMediator;
-	import net.nweber.plex.model.PlexModel;
-	import net.nweber.plex.parsers.IAlbumParser;
-	import net.nweber.plex.parsers.IArtistParser;
-	import net.nweber.plex.parsers.IEpisodeParser;
-	import net.nweber.plex.parsers.IItemListParser;
-	import net.nweber.plex.parsers.IMediaParser;
-	import net.nweber.plex.parsers.IMovieParser;
-	import net.nweber.plex.parsers.IPartParser;
-	import net.nweber.plex.parsers.ISeasonParser;
-	import net.nweber.plex.parsers.ISectionsParser;
-	import net.nweber.plex.parsers.IServersParser;
-	import net.nweber.plex.parsers.IShowParser;
-	import net.nweber.plex.parsers.IStreamParser;
-	import net.nweber.plex.parsers.ITrackParser;
-	import net.nweber.plex.parsers.IUserParser;
-	import net.nweber.plex.parsers.xml.AlbumParser;
-	import net.nweber.plex.parsers.xml.ArtistParser;
-	import net.nweber.plex.parsers.xml.EpisodeParser;
-	import net.nweber.plex.parsers.xml.ItemListParser;
-	import net.nweber.plex.parsers.xml.MediaParser;
-	import net.nweber.plex.parsers.xml.MovieParser;
-	import net.nweber.plex.parsers.xml.MyPlexServersParser;
-	import net.nweber.plex.parsers.xml.MyPlexUserParser;
-	import net.nweber.plex.parsers.xml.PartParser;
-	import net.nweber.plex.parsers.xml.SeasonParser;
-	import net.nweber.plex.parsers.xml.SectionsParser;
-	import net.nweber.plex.parsers.xml.ShowParser;
-	import net.nweber.plex.parsers.xml.StreamParser;
-	import net.nweber.plex.parsers.xml.TrackParser;
-	import net.nweber.plex.services.IDiscoverServerService;
-	import net.nweber.plex.services.IGetSectionContentsService;
-	import net.nweber.plex.services.ILoginService;
-	import net.nweber.plex.services.ISectionsService;
-	import net.nweber.plex.services.IServersService;
-	import net.nweber.plex.services.remote.ProxyLoginService;
-	import net.nweber.plex.services.remote.ProxyServersService;
-	import net.nweber.plex.services.stub.StubDiscoverServerService;
-	import net.nweber.plex.services.stub.StubGetSectionContentsService;
-	import net.nweber.plex.services.stub.StubLoginService;
-	import net.nweber.plex.services.stub.StubSectionsService;
-	import net.nweber.plex.services.stub.StubServersService;
-	import net.nweber.plex.views.LoginView;
+	import net.nweber.plex.components.*;
+	import net.nweber.plex.mediators.*;
+	import net.nweber.plex.model.*;
+	import net.nweber.plex.parsers.*;
+	import net.nweber.plex.parsers.xml.*;
+	import net.nweber.plex.services.*;
+	import net.nweber.plex.services.remote.*;
+	import net.nweber.plex.services.stub.*;
+	import net.nweber.plex.views.*;
 	
 	import org.robotlegs.mvcs.Context;
 	
@@ -59,7 +22,7 @@ package net.nweber.plex
 		//
 		//----------------------------------------
 		
-		private static const USE_STUB_DATA:Boolean = true;
+		private static const USE_STUB_DATA:Boolean = false;
 		
 		//----------------------------------------
 		//
@@ -83,6 +46,7 @@ package net.nweber.plex
 		
 		protected function mapModels():void {
 			injector.mapSingleton(PlexModel);
+			injector.mapSingleton(LayoutModel);
 		}
 		
 		protected function mapDataParsers():void {
@@ -118,13 +82,20 @@ package net.nweber.plex
 			else {
 				injector.mapSingletonOf(ILoginService, ProxyLoginService);
 				injector.mapSingletonOf(IServersService, ProxyServersService);
-				//injector.mapSingletonOf(ISectionsService, StubSectionsService);
+				injector.mapSingletonOf(IDiscoverServerService, DiscoverServerService);
+				injector.mapSingletonOf(ISectionsService, SectionsService);
+				injector.mapSingletonOf(IGetSectionContentsService, GetSectionContentsService);
 			}
 		}
 		
 		protected function mapMediators():void {
 			mediatorMap.mapView(LoadingSpinner, LoadingMediator);
 			mediatorMap.mapView(LoginView, LoginMediator);
+			mediatorMap.mapView(HomeView, HomeMediator);
+			mediatorMap.mapView(HeaderBar, HeaderMediator);
+			mediatorMap.mapView(MoviesView, MoviesMediator);
+			mediatorMap.mapView(MusicView, MusicMediator);
+			mediatorMap.mapView(ShowsView, ShowsMediator);
 		}
 		
 		protected function mapApplication():void {

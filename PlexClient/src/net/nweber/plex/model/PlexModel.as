@@ -1,14 +1,13 @@
 package net.nweber.plex.model
 {
-	import net.nweber.plex.valueObjects.Artist;
-	import net.nweber.plex.valueObjects.Movie;
-	import net.nweber.plex.valueObjects.Section;
+	import mx.collections.ArrayList;
+	
 	import net.nweber.plex.valueObjects.Server;
-	import net.nweber.plex.valueObjects.Show;
 	import net.nweber.plex.valueObjects.User;
 	
 	import org.robotlegs.mvcs.Actor;
 	
+	[Bindable]
 	/**
 	 * 
 	 * 
@@ -69,43 +68,43 @@ package net.nweber.plex.model
 			return "http://" + (localAvailable ? server.localAddress : server.remoteAddress) + ":" + server.port;
 		}
 		
-		private var _sections:Vector.<Section>;
+		private var _sections:ArrayList;
 		
-		public function get sections():Vector.<Section> {
+		public function get sections():ArrayList {
 			return _sections;
 		}
 		
-		public function set sections(value:Vector.<Section>):void {
+		public function set sections(value:ArrayList):void {
 			_sections = value;
 		}
 		
-		private var _movies:Vector.<Movie>;
+		private var _movies:ArrayList;
 		
-		public function get movies():Vector.<Movie> {
+		public function get movies():ArrayList {
 			return _movies;
 		}
 		
-		public function set movies(value:Vector.<Movie>):void {
+		public function set movies(value:ArrayList):void {
 			_movies = value;
 		}
 		
-		private var _shows:Vector.<Show>;
+		private var _shows:ArrayList;
 		
-		public function get shows():Vector.<Show> {
+		public function get shows():ArrayList {
 			return _shows;
 		}
 		
-		public function set shows(value:Vector.<Show>):void {
+		public function set shows(value:ArrayList):void {
 			_shows = value;
 		}
 		
-		private var _artists:Vector.<Artist>;
+		private var _artists:ArrayList;
 		
-		public function get artists():Vector.<Artist> {
+		public function get artists():ArrayList {
 			return _artists;
 		}
 		
-		public function set artists(value:Vector.<Artist>):void {
+		public function set artists(value:ArrayList):void {
 			_artists = value;
 		}
 		

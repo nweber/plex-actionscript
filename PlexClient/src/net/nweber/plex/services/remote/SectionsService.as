@@ -1,4 +1,4 @@
-package net.nweber.plex.services.stub
+package net.nweber.plex.services.remote
 {
 	import mx.collections.ArrayList;
 	
@@ -11,8 +11,16 @@ package net.nweber.plex.services.stub
 	 * 
 	 * @author Nathan Weber
 	 */
-	public class StubSectionsService extends BaseStubService implements ISectionsService
+	public class SectionsService extends BasePlexService implements ISectionsService
 	{
+		//----------------------------------------
+		//
+		// Constants
+		//
+		//----------------------------------------
+		
+		private const FRAGMENT:String = "library/sections?X-Plex-Token=";
+		
 		//----------------------------------------
 		//
 		// Variables
@@ -22,10 +30,6 @@ package net.nweber.plex.services.stub
 		[Inject]
 		public var parser:ISectionsParser;
 		
-		override protected function get stubDataURL():String {
-			return "stub/sections.xml";
-		}
-		
 		//----------------------------------------
 		//
 		// Public Methods
@@ -33,15 +37,16 @@ package net.nweber.plex.services.stub
 		//----------------------------------------
 		
 		public function execute(token:String):void {
-			doLoad();
+			var fragment:String = FRAGMENT + token;
+			doLoad(fragment);
 		}
 		
-		override protected function doParse(data:Object):void {
+		override protected function processComplete(data:Object):void {
 			var sections:ArrayList = parser.parse(data);
 			dispatch(new SectionsEvent(SectionsEvent.COMPLETE, sections));
 		}
 		
-		override protected function doError():void {
+		override protected function processError():void {
 			dispatch(new SectionsEvent(SectionsEvent.ERROR));
 		}
 		
@@ -51,7 +56,7 @@ package net.nweber.plex.services.stub
 		//
 		//----------------------------------------
 		
-		public function StubSectionsService() {
+		public function SectionsService() {
 			super();
 		}
 	}

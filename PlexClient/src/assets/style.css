@@ -20,6 +20,14 @@ s|Application {
 	backgroundColor: #263137;
 }
 
+.lightGreenLabel {
+	color: #ccef01;
+}
+
+.greenLabel {
+	color: #8dc63f;
+}
+
 .whiteLabel {
 	color: #FFFFFF;
 }
@@ -46,4 +54,8 @@ s|Application {
 .loginCheckBox {
 	fontSize: 24;
 	skinClass: ClassReference("net.nweber.plex.skins.LoginCheckBoxSkin");
+}
+
+.clearList {
+	skinClass: ClassReference("net.nweber.plex.skins.ClearListSkin");
 }

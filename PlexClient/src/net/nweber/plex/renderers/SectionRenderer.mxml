@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	autoDrawBackground="false">
+	
+	<fx:Script>
+		<![CDATA[
+			[Embed(source="assets/arrow.png")]
+			private static const arrow:Class;
+			
+			[Embed(source="assets/arrow_selected.png")]
+			private static const arrowSelected:Class;
+		]]>
+	</fx:Script>
+	
+	<s:states>
+		<s:State name="selected"/>
+		<s:State name="hovered"/>
+		<s:State name="normal"/>
+	</s:states>
+	
+	<s:Image
+		verticalCenter="7"
+		source="{arrow}"
+		source.selected="{arrowSelected}"
+		visible="false"
+		visible.selected="true"/>
+	
+	<s:Label
+		text="{String(data.title).toLowerCase()}"
+		fontSize="52"
+		verticalCenter="0"
+		left="35"
+		styleName="whiteLabel"
+		styleName.hovered="greenLabel"
+		styleName.selected="greenLabel"/>
+	
+</s:ItemRenderer>

@@ -45,7 +45,29 @@
 		visible="false"
 		visible.loading="true"/>
 	
+	<components:HeaderBar
+		top="0" height="50"
+		left="0" right="0"
+		includeIn="mediaGroup"/>
 	
+	<views:HomeView
+		top="50" bottom="0"
+		left="0" right="0"
+		includeIn="home"/>
 	
+	<views:MoviesView
+		top="50" bottom="0"
+		left="0" right="0"
+		includeIn="movies"/>
+	
+	<views:MusicView
+		top="50" bottom="0"
+		left="0" right="0"
+		includeIn="music"/>
+	
+	<views:ShowsView
+		top="50" bottom="0"
+		left="0" right="0"
+		includeIn="tvShows"/>
 	
 </s:Application>
